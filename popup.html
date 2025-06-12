@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>VisionAid Color Correction</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>VisionAid Color Correction</h1>
+    <div class="controls">
+      <select id="visionType">
+        <option value="">Normal Vision</option>
+        <option value="protanopia">Protanopia</option>
+        <option value="deuteranopia">Deuteranopia</option>
+        <option value="tritanopia">Tritanopia</option>
+        <option value="achromatopsia">Achromatopsia</option>
+      </select>
+      <label class="switch">
+        <input type="checkbox" id="correction">
+        <span class="slider">Color Correction</span>
+      </label>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
