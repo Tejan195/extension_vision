@@ -3,33 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VisionAid Color Correction</title>
+  <title>VisionAid</title>
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
   <div class="container">
     <h1>👓 VisionAid</h1>
-    <label for="visionType" class="label">Color Correction</label>
 
-    <div class="custom-select" id="customDropdown" data-value="">
-      <div class="selected">Normal Vision</div>
-      <ul class="dropdown">
-        <li data-value="">Normal Vision</li>
-        <li data-value="protanopia">Protanopia</li>
-        <li data-value="deuteranopia">Deuteranopia</li>
-        <li data-value="tritanopia">Tritanopia</li>
-        <li data-value="achromatopsia">Achromatopsia</li>
-      </ul>
+    <div class="controls">
+      <label for="visionType">Color Correction</label>
+      
+      <div class="custom-select-wrapper">
+        <div class="custom-select" id="customSelect">
+          <span class="selected">Normal Vision</span>
+          <svg class="arrow" viewBox="0 0 24 24" width="20" height="20">
+            <path d="M6 9l6 6 6-6" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <ul class="select-options hidden" id="selectOptions">
+          <li data-value="normal">Normal Vision</li>
+          <li data-value="protanopia">Protanopia</li>
+          <li data-value="deuteranopia">Deuteranopia</li>
+          <li data-value="tritanopia">Tritanopia</li>
+          <li data-value="achromatopsia">Achromatopsia</li>
+        </ul>
+      </div>
+
+      <div class="switch">
+        <span class="label-text">Color Correction</span>
+        <label class="slider">
+          <input type="checkbox" id="correction" />
+          <span class="toggle"></span>
+        </label>
+      </div>
     </div>
 
-    <label class="switch">
-      <span class="label-text">Color Correction</span>
-      <input type="checkbox" id="correction" />
-      <span class="slider"></span>
-    </label>
-
-    <div class="footer">VisionAid v1.0 • Made with ❤️</div>
+    <footer>VisionAid v1.0 • Made with ❤️</footer>
   </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
