@@ -1,4 +1,6 @@
-const visionType = document.getElementById('visionType');
+const dropdown = document.getElementById('customDropdown');
+const selected = dropdown.querySelector('.selected');
+const options = dropdown.querySelectorAll('.dropdown li');
 const correction = document.getElementById('correction');
 
 const filters = {
@@ -15,38 +17,66 @@ const correctionFilters = {
   achromatopsia: 'contrast(1.5) brightness(1.2) saturate(2)'
 };
 
-// Load saved settings
-chrome.storage.sync.get(['visionType', 'correction'], (data) => {
-  if (data.visionType) visionType.value = data.visionType;
-  if (data.correction) correction.checked = data.correction;
+document.addEventListener('DOMContentLoaded', () => {
+  // Load saved settings
+  chrome.storage.sync.get(['visionType', 'correction'], (data) => {
+    if (data.visionType) {
+      selected.textContent = optionsNamed(data.visionType) || 'Normal Vision';
+      dropdown.dataset.value = data.visionType;
+    }
+    if (data.correction !== undefined) {
+      correction.checked = data.correction;
+    }
+  });
+
+  // Open/close dropdown
+  dropdown.addEventListener('click', () => {
+    dropdown.classList.toggle('open');
+  });
+
+  // Option click
+  options.forEach(option => {
+    option.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selected.textContent = option.textContent;
+      dropdown.dataset.value = option.dataset.value;
+      dropdown.classList.remove('open');
+      updateFilters();
+    });
+  });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target)) {
+      dropdown.classList.remove('open');
+    }
+  });
+
+  // Toggle handler
+  correction.addEventListener('change', updateFilters);
 });
 
-// Save settings and apply system-wide filters
+// Helper to get label
+function optionsNamed(value) {
+  const option = [...options].find(opt => opt.dataset.value === value);
+  return option ? option.textContent : null;
+}
+
+// Filter logic
 function updateFilters() {
-  const settings = {
-    visionType: visionType.value,
-    correction: correction.checked
-  };
-  
-  chrome.storage.sync.set(settings);
-  
-  if (!settings.visionType) {
-    chrome.runtime.sendMessage({
-      action: 'applyFilter',
-      filter: 'none'
-    });
+  const visionType = dropdown.dataset.value || '';
+  const correctionEnabled = correction.checked;
+
+  chrome.storage.sync.set({ visionType, correction: correctionEnabled });
+
+  if (!visionType) {
+    chrome.runtime.sendMessage({ action: 'applyFilter', filter: 'none' });
     return;
   }
 
-  const filter = settings.correction 
-    ? correctionFilters[settings.visionType] 
-    : filters[settings.visionType];
+  const filter = correctionEnabled
+    ? correctionFilters[visionType]
+    : filters[visionType];
 
-  chrome.runtime.sendMessage({
-    action: 'applyFilter',
-    filter: filter
-  });
+  chrome.runtime.sendMessage({ action: 'applyFilter', filter });
 }
-
-visionType.addEventListener('change', updateFilters);
-correction.addEventListener('change', updateFilters);

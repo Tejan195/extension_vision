@@ -1,26 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VisionAid Color Correction</title>
-  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
   <div class="container">
-    <h1>VisionAid Color Correction</h1>
-    <div class="controls">
-      <select id="visionType">
-        <option value="">Normal Vision</option>
-        <option value="protanopia">Protanopia</option>
-        <option value="deuteranopia">Deuteranopia</option>
-        <option value="tritanopia">Tritanopia</option>
-        <option value="achromatopsia">Achromatopsia</option>
-      </select>
-      <label class="switch">
-        <input type="checkbox" id="correction">
-        <span class="slider">Color Correction</span>
-      </label>
+    <h1>👓 VisionAid</h1>
+    <label for="visionType" class="label">Color Correction</label>
+
+    <div class="custom-select" id="customDropdown" data-value="">
+      <div class="selected">Normal Vision</div>
+      <ul class="dropdown">
+        <li data-value="">Normal Vision</li>
+        <li data-value="protanopia">Protanopia</li>
+        <li data-value="deuteranopia">Deuteranopia</li>
+        <li data-value="tritanopia">Tritanopia</li>
+        <li data-value="achromatopsia">Achromatopsia</li>
+      </ul>
     </div>
+
+    <label class="switch">
+      <span class="label-text">Color Correction</span>
+      <input type="checkbox" id="correction" />
+      <span class="slider"></span>
+    </label>
+
+    <div class="footer">VisionAid v1.0 • Made with ❤️</div>
   </div>
   <script src="popup.js"></script>
 </body>
