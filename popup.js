@@ -41,6 +41,18 @@ document.addEventListener('click', (e) => {
 });
 
 // Load saved settings
+const dyslexiaSettings = { fontSize: 18, lineSpacing: 1.8, letterSpacing: 0.5, wordSpacing: 0.3, backgroundColor: 'cream', bionicReading: true };
+
+chrome.storage.sync.get(['dyslexiaSupport'], (data) => {
+  if (data.dyslexiaSupport) {
+    setFontSize(dyslexiaSettings.fontSize);
+    setLineSpacing(dyslexiaSettings.lineSpacing);
+    setLetterSpacing(dyslexiaSettings.letterSpacing);
+    setWordSpacing(dyslexiaSettings.wordSpacing);
+    setBackgroundColor(dyslexiaSettings.backgroundColor);
+    setBionicReading(dyslexiaSettings.bionicReading);
+  }
+});
 chrome.storage.sync.get(['visionType', 'correction'], (data) => {
   if (data.visionType) {
     const selectedOption = optionsList.querySelector(`li[data-value="${data.visionType}"]`);
@@ -74,3 +86,29 @@ function updateFilters() {
 }
 
 correction.addEventListener('change', updateFilters);
+
+// Dyslexia Support Toggle
+const dyslexiaSupport = document.getElementById('dyslexiaSupport');
+
+dyslexiaSupport.addEventListener('change', () => {
+  const isEnabled = dyslexiaSupport.checked;
+  
+  chrome.storage.sync.set({
+    dyslexiaSupport: isEnabled
+  });
+
+  if (isEnabled) {
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        action: 'applyDyslexiaStyles',
+        settings: dyslexiaSettings
+      });
+    });
+  } else {
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        action: 'removeDyslexiaStyles'
+      });
+    });
+  }
+});
