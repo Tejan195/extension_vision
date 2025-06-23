@@ -6,7 +6,7 @@
 }
 
 body {
-  width: 340px;
+  width: 400px;
   font-family: 'Inter', 'Segoe UI', sans-serif;
   background: linear-gradient(135deg, #000000 0%, #1f1f1f 100%);
   color: #ffffff;
@@ -17,13 +17,13 @@ body {
   padding: 24px;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(8px);
-  border-radius: 0px;
+  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: 26rem;
+  min-height: 700px;
 }
 
 /* Heading */
@@ -47,11 +47,84 @@ h1::after {
   border-radius: 3px;
 }
 
+/* Tab Navigation */
+.tab-nav {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #d1d5db;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tab-button.active {
+  color: #ffffff;
+  background: linear-gradient(90deg, #a78bfa, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #a78bfa, #7c3aed);
+  border-radius: 3px;
+}
+
+.tab-button:hover {
+  color: #f3f4f6;
+}
+
+/* Tab Content */
+.tab-content {
+  position: relative;
+  flex-grow: 1;
+}
+
+.tab-pane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transform: translateX(20px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tab-pane.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
 /* Controls */
 .controls {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* Subheading */
+h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #d1d5db;
+  margin-bottom: 8px;
 }
 
 /* Custom Select */
@@ -70,6 +143,7 @@ h1::after {
   align-items: center;
   cursor: pointer;
   transition: border-color 0.2s ease;
+  font-size: 14px;
 }
 
 .custom-select:hover,
@@ -104,7 +178,7 @@ h1::after {
 }
 
 .select-options.open {
-  max-height: 500px;
+  max-height: 300px; /* Increased to accommodate more options */
   opacity: 1;
   pointer-events: auto;
 }
@@ -112,12 +186,71 @@ h1::after {
 .select-options li {
   padding: 12px 16px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 13px;
   color: #f3f4f6;
   transition: background 0.2s ease;
 }
 .select-options li:hover {
   background: rgba(255, 255, 255, 0.08);
+}
+
+/* Sub-panel for sliders */
+.sub-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #1f1f1f;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  z-index: 10;
+}
+
+.sub-panel.active {
+  display: block;
+}
+
+.sub-panel .range-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  outline: none;
+  transition: background 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.sub-panel .range-slider:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sub-panel .range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(90deg, #a78bfa, #7c3aed);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sub-panel .range-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(90deg, #a78bfa, #7c3aed);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sub-panel span {
+  font-size: 13px;
+  color: #d1d5db;
+  display: block;
+  text-align: center;
 }
 
 /* Switch */
@@ -154,7 +287,7 @@ h1::after {
   position: absolute;
   top: 2.5px;
   left: 2.5px;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease six;
 }
 
 .slider input:checked + .toggle {
@@ -164,6 +297,49 @@ h1::after {
 
 .slider input:checked + .toggle::after {
   transform: translateX(20px);
+}
+
+/* Control Group */
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #d1d5db;
+}
+
+/* Button Grid */
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 8px;
+}
+
+.bg-button, .tool-button {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 13px;
+  color: #f3f4f6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.bg-button.active, .tool-button.active {
+  background: linear-gradient(90deg, #a78bfa, #7c3aed);
+  border-color: #8b5cf6;
+  color: #ffffff;
+}
+
+.bg-button:hover, .tool-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #8b5cf6;
 }
 
 /* Footer */

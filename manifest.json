@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "VisionAid Color Correction",
   "version": "1.0",
-  "description": "System-wide color vision correction for various types of color blindness",
+  "description": "System-wide color vision correction and dyslexia support features",
   "permissions": [
     "activeTab",
     "storage",
@@ -10,6 +10,13 @@
   ],
   "host_permissions": [
     "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
   ],
   "action": {
     "default_popup": "popup.html",
