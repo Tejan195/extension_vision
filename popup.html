@@ -1,169 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VisionAid Accessibility</title>
-  <link rel="stylesheet" href="popup.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisionAid</title>
+    <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div class="container">
-    <h1>👓 VisionAid</h1>
-
-    <!-- Tab Navigation -->
-    <div class="tab-nav">
-      <button class="tab-button active" data-tab="color-vision">Color Vision</button>
-      <button class="tab-button" data-tab="dyslexia-features">Dyslexia Features</button>
-    </div>
-
-    <!-- Tab Content -->
-    <div class="tab-content">
-      <!-- Color Vision Tab -->
-      <div class="tab-pane active" id="color-vision">
-        <div class="controls">
-          <h2>Color Correction</h2>
-          <div class="custom-select-wrapper">
-            <div id="customSelect" class="custom-select">
-              <span class="selected" data-value="normal">Normal Vision</span>
-              <span class="arrow">▼</span>
-            </div>
-            <ul id="selectOptions" class="select-options">
-              <li data-value="normal">Normal Vision</li>
-              <li data-value="protanopia">Protanopia</li>
-              <li data-value="deuteranopia">Deuteranopia</li>
-              <li data-value="tritanopia">Tritanopia</li>
-              <li data-value="achromatopsia">Achromatopsia</li>
-            </ul>
-          </div>
-          <div class="switch">
-            <label>Color Correction</label>
-            <label class="slider">
-              <input id="correction" type="checkbox">
-              <span class="toggle"></span>
-            </label>
-          </div>
+    <div class="container">
+        <h1>👓 VisionAid</h1>
+        <div class="tab-nav">
+            <button class="tab-button active" data-tab="color-vision">Color Vision</button>
+            <button class="tab-button" data-tab="dyslexia-features">Dyslexia Features</button>
         </div>
-      </div>
-
-      <!-- Dyslexia Features Tab -->
-      <div class="tab-pane" id="dyslexia-features">
-        <div class="controls">
-          <h2>Dyslexia Support</h2>
-          <div class="switch">
-            <label>Enable All Features</label>
-            <label class="slider">
-              <input id="dyslexiaSupport" type="checkbox">
-              <span class="toggle"></span>
-            </label>
-          </div>
-
-          <!-- Font Family Dropdown -->
-          <div class="control-group">
-            <label class="control-label">Font Style</label>
-            <div class="custom-select-wrapper">
-              <div id="fontFamilySelect" class="custom-select">
-                <span class="selected" data-value="opendyslexic">OpenDyslexic</span>
-                <span class="arrow">▼</span>
-              </div>
-              <ul id="fontFamilyOptions" class="select-options">
-                <li data-value="lexend">Lexend</li>
-                <li data-value="opendyslexic">OpenDyslexic</li>
-                <li data-value="andika">Andika</li>
-                <li data-value="atkinson">Atkinson</li>
-                <li data-value="comic">Comic Neue</li>
-              </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="color-vision">
+                <div class="controls">
+                    <div class="control-group">
+                        <h2>Color Correction</h2>
+                        <div class="custom-select-wrapper">
+                            <div class="custom-select" id="customSelect">
+                                <span class="selected">Normal Vision</span>
+                                <span class="arrow">▼</span>
+                            </div>
+                            <ul class="select-options" id="selectOptions">
+                                <li data-value="normal">Normal Vision</li>
+                                <li data-value="protanopia">Protanopia</li>
+                                <li data-value="deuteranopia">Deuteranopia</li>
+                                <li data-value="tritanopia">Tritanopia</li>
+                                <li data-value="achromatopsia">Achromatopsia</li>
+                            </ul>
+                        </div>
+                        <label class="switch">
+                            <span>Color Correction</span>
+                            <div class="slider">
+                                <input type="checkbox" id="correction">
+                                <div class="toggle"></div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
             </div>
-          </div>
+            <div class="tab-pane" id="dyslexia-features">
+                <div class="controls">
+                    <div class="control-group">
+                        <h2>Dyslexia Support</h2>
+                        <label class="switch">
+                            <span>Enable All Features</span>
+                            <div class="slider">
+                                <input type="checkbox" id="dyslexiaSupport">
+                                <div class="toggle"></div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="control-group">
+                        <h2>Font Style</h2>
+                        <div class="custom-select-wrapper">
+                            <div class="custom-select" id="fontFamilySelect">
+                                <span class="selected">OpenDyslexic</span>
+                                <span class="arrow">▼</span>
+                            </div>
+                            <ul class="select-options" id="fontFamilyOptions">
+                                <li data-value="lexend">Lexend</li>
+                                <li data-value="opendyslexic">OpenDyslexic</li>
+                                <li data-value="andika">Andika</li>
+                                <li data-value="atkinson">Atkinson</li>
+                                <li data-value="comic-neue">Comic Neue</li>
+                            </ul>
+                        </div>
+                    </div>
+                   <div class="control-group">
+  <h2>Text Settings</h2>
 
-          <!-- Text Settings Dropdown with Sliders -->
-          <div class="control-group">
-            <label class="control-label">Text Settings</label>
-            <div class="custom-select-wrapper">
-              <div id="textSettingsSelect" class="custom-select">
-                <span class="selected" data-subpanel="font-size">Font Size</span>
-                <span class="arrow">▼</span>
-              </div>
-              <ul id="textSettingsOptions" class="select-options">
-                <li data-subpanel="font-size">Font Size</li>
-                <li data-subpanel="line-spacing">Line Spacing</li>
-                <li data-subpanel="letter-spacing">Letter Spacing</li>
-                <li data-subpanel="word-spacing">Word Spacing</li>
-              </ul>
-              <div class="sub-panel" id="font-size">
-                <input type="range" id="fontSize" min="14" max="24" value="16" class="range-slider">
-                <span id="fontSizeValue">16px</span>
-              </div>
-              <div class="sub-panel" id="line-spacing">
-                <input type="range" id="lineSpacing" min="1" max="2" step="0.1" value="1.5" class="range-slider">
-                <span id="lineSpacingValue">1.5x</span>
-              </div>
-              <div class="sub-panel" id="letter-spacing">
-                <input type="range" id="letterSpacing" min="0" max="1" step="0.1" value="0" class="range-slider">
-                <span id="letterSpacingValue">0em</span>
-              </div>
-              <div class="sub-panel" id="word-spacing">
-                <input type="range" id="wordSpacing" min="0" max="1" step="0.1" value="0" class="range-slider">
-                <span id="wordSpacingValue">0em</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Column Width Dropdown -->
-          <div class="control-group">
-            <label class="control-label">Column Width</label>
-            <div class="custom-select-wrapper">
-              <div id="columnWidthSelect" class="custom-select">
-                <span class="selected" data-value="800">800px</span>
-                <span class="arrow">▼</span>
-              </div>
-              <ul id="columnWidthOptions" class="select-options">
-                <li data-value="400">400px</li>
-                <li data-value="450">450px</li>
-                <li data-value="500">500px</li>
-                <li data-value="550">550px</li>
-                <li data-value="600">600px</li>
-                <li data-value="650">650px</li>
-                <li data-value="700">700px</li>
-                <li data-value="750">750px</li>
-                <li data-value="800">800px</li>
-                <li data-value="850">850px</li>
-                <li data-value="900">900px</li>
-                <li data-value="950">950px</li>
-                <li data-value="1000">1000px</li>
-                <li data-value="1050">1050px</li>
-                <li data-value="1100">1100px</li>
-                <li data-value="1150">1150px</li>
-                <li data-value="1200">1200px</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Background Color -->
-          <div class="control-group">
-            <label class="control-label">Background Color</label>
-            <div class="button-grid">
-              <button data-bg="white" class="bg-button">White</button>
-              <button data-bg="cream" class="bg-button">Cream</button>
-              <button data-bg="light-blue" class="bg-button">Cool</button>
-              <button data-bg="mint" class="bg-button">Mint</button>
-            </div>
-          </div>
-
-          <!-- Reading Tools -->
-          <div class="control-group">
-            <label class="control-label">Reading Tools</label>
-            <div class="button-grid">
-              <button id="readingRuler" class="tool-button">Reading Ruler</button>
-              <button id="bionicReading" class="tool-button">Bionic Reading</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <footer>VisionAid v1.1 • Made with ❤️</footer>
+  <div class="slider-row">
+    <label><i class="icon">⤢</i> Font Size: <span id="fontSizeValue">16px</span></label>
+    <input type="range" id="fontSize" min="12" max="24" value="16" class="styled-slider" />
   </div>
 
-  <script src="popup.js"></script>
+  <div class="slider-row">
+    <label><i class="icon">⇡</i> Line Spacing: <span id="lineSpacingValue">1.5x</span></label>
+    <input type="range" id="lineSpacing" min="1" max="2" step="0.1" value="1.5" class="styled-slider" />
+  </div>
+
+  <div class="slider-row">
+    <label><i class="icon">↔</i> Letter Spacing: <span id="letterSpacingValue">0em</span></label>
+    <input type="range" id="letterSpacing" min="0" max="1" step="0.1" value="0" class="styled-slider" />
+  </div>
+
+  <div class="slider-row">
+    <label><i class="icon">⇆</i> Word Spacing: <span id="wordSpacingValue">0em</span></label>
+    <input type="range" id="wordSpacing" min="0" max="1" step="0.1" value="0" class="styled-slider" />
+  </div>
+</div>
+
+<div class="control-group">
+  <h2>Column Width</h2>
+  <div class="slider-row">
+    <label><i class="icon">☰</i> Column Width: <span id="columnWidthValue">800px</span></label>
+    <input type="range" id="columnWidth" min="400" max="1200" step="50" value="800" class="styled-slider" />
+  </div>
+</div>
+
+                    <div class="control-group">
+                        <h2>Column Width</h2>
+                        <div>
+                            <label>Column Width:</label>
+                            <input type="range" id="columnWidth" min="400" max="1200" step="50" value="800">
+                            <span id="columnWidthValue">800px</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <h2>Reading Tools</h2>
+                        <div class="button-grid">
+                            <button class="tool-button" id="readingRuler">Reading Ruler</button>
+                            <button class="tool-button" id="bionicReading">Bionic Reading</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer>VisionAid v1.1 • Made with BOLT</footer>
+    </div>
+    <script src="popup.js"></script>
 </body>
 </html>

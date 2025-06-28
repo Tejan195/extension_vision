@@ -2,66 +2,48 @@ let originalContents = new WeakMap(); // Store original content for Bionic Readi
 
 // Dyslexia support functions
 function applyDyslexiaStyles(settings) {
-  // Inject font styles
-  if (!document.getElementById('dyslexia-font-style')) {
+  removeDyslexiaStyles();
+
+  // Set CSS variables for all settings
+  document.documentElement.style.setProperty('--font-size', `${settings.fontSize}px`);
+  document.documentElement.style.setProperty('--line-height', settings.lineSpacing);
+  document.documentElement.style.setProperty('--letter-spacing', `${settings.letterSpacing}em`);
+  document.documentElement.style.setProperty('--word-spacing', `${settings.wordSpacing}em`);
+  document.documentElement.style.setProperty('--background-color', backgroundColorMap[settings.backgroundColor] || '#ffffff');
+  document.documentElement.style.setProperty('--column-width', `${settings.columnWidth}px`);
+
+  // Inject style if not present
+  if (!document.getElementById('visionaid-dyslexia-styles')) {
     const style = document.createElement('style');
-    style.id = 'dyslexia-font-style';
+    style.id = 'visionaid-dyslexia-styles';
     style.innerHTML = `
-      @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&family=Andika&family=Atkinson+Hyperlegible&family=Comic+Neue:wght@400;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Lexend&family=Andika&family=Atkinson+Hyperlegible&family=Comic+Neue&display=swap');
       @import url('https://fonts.cdnfonts.com/css/open-dyslexic');
-      .dyslexia-font-lexend { font-family: 'Lexend', Arial, sans-serif !important; }
-      .dyslexia-font-opendyslexic { font-family: 'OpenDyslexic', Arial, sans-serif !important; }
-      .dyslexia-font-andika { font-family: 'Andika', Arial, sans-serif !important; }
-      .dyslexia-font-atkinson { font-family: 'Atkinson Hyperlegible', Arial, sans-serif !important; }
-      .dyslexia-font-comic-neue { font-family: 'Comic Neue', Arial, sans-serif !important; }
-      body, p, div, span, h1, h2, h3, h4, h5, h6, li, a, article, section {
-        font-size: var(--font-size, ${settings.fontSize}px) !important;
-        line-height: var(--line-height, ${settings.lineSpacing}) !important;
-        letter-spacing: var(--letter-spacing, ${settings.letterSpacing}em) !important;
-        word-spacing: var(--word-spacing, ${settings.wordSpacing}em) !important;
-      }
-      body {
-        background-color: var(--background-color, ${getBackgroundColor(settings.backgroundColor)}) !important;
-        max-width: ${settings.columnWidth}px !important;
-        margin: 0 auto !important;
+      .visionaid-text {
+        font-family: '${fontMap[settings.fontFamily] || 'OpenDyslexic'}', sans-serif !important;
+        font-size: var(--font-size) !important;
+        line-height: var(--line-height) !important;
+        letter-spacing: var(--letter-spacing) !important;
+        word-spacing: var(--word-spacing) !important;
+        max-width: var(--column-width) !important;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
       }
     `;
     document.head.appendChild(style);
   }
 
-  // Apply font family
-  const fontClass = `dyslexia-font-${settings.fontFamily}`;
-  document.body.classList.remove(
-    'dyslexia-font-lexend',
-    'dyslexia-font-opendyslexic',
-    'dyslexia-font-andika',
-    'dyslexia-font-atkinson',
-    'dyslexia-font-comic-neue'
-  );
-  if (settings.fontFamily !== 'none') {
-    document.body.classList.add(fontClass);
-  }
+  // Add class to all readable tags
+  const readableTags = ['p', 'span', 'li', 'label', 'a', 'strong', 'em', 'blockquote', 'dd', 'dt', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+  readableTags.forEach(tag => {
+    document.querySelectorAll(tag).forEach(el => {
+      el.classList.add('visionaid-text');
+    });
+  });
 
-  // Update CSS custom properties
-  document.documentElement.style.setProperty('--font-size', `${settings.fontSize}px`);
-  document.documentElement.style.setProperty('--line-height', settings.lineSpacing);
-  document.documentElement.style.setProperty('--letter-spacing', `${settings.letterSpacing}em`);
-  document.documentElement.style.setProperty('--word-spacing', `${settings.wordSpacing}em`);
-  document.documentElement.style.setProperty('--background-color', getBackgroundColor(settings.backgroundColor));
-
-  // Apply Bionic Reading
-  if (settings.bionicReading) {
-    enableBionicReading();
-  } else {
-    disableBionicReading();
-  }
-
-  // Apply Reading Ruler
-  if (settings.readingRuler) {
-    enableReadingRuler();
-  } else {
-    disableReadingRuler();
-  }
+  // Reading ruler and bionic reading
+  if (settings.readingRuler) enableReadingRuler();
+  if (settings.bionicReading) enableBionicReading();
 }
 
 function getBackgroundColor(colorName) {
@@ -187,42 +169,179 @@ overlay.style.cssText = `
 document.body.appendChild(overlay);
 
 // Listen for messages
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log('Message received in content.js:', message);
-  if (message.action === 'applyFilter') {
-    overlay.style.filter = message.filter || 'none';
-  }
-  if (message.action === 'applyDyslexiaStyles') {
-    applyDyslexiaStyles(message.settings);
-  }
-  if (message.action === 'removeDyslexiaStyles') {
-    document.documentElement.style.removeProperty('--font-size');
-    document.documentElement.style.removeProperty('--line-height');
-    document.documentElement.style.removeProperty('--letter-spacing');
-    document.documentElement.style.removeProperty('--word-spacing');
-    document.documentElement.style.removeProperty('--background-color');
-    document.body.classList.remove(
-      'dyslexia-font-lexend',
-      'dyslexia-font-opendyslexic',
-      'dyslexia-font-andika',
-      'dyslexia-font-atkinson',
-      'dyslexia-font-comic-neue'
-    );
-    document.body.style.removeProperty('background-color');
-    document.body.style.removeProperty('max-width');
-    document.body.style.removeProperty('margin');
-    disableBionicReading();
-    disableReadingRuler();
+// content.js
+
+chrome.runtime.onMessage.addListener((request) => {
+  if (request.action === 'applyFilter') {
+    applyColorFilter(request.filter);
+  } else if (request.action === 'applyDyslexiaStyles') {
+    applyDyslexiaStyles(request.settings);
+  } else if (request.action === 'removeDyslexiaStyles') {
+    removeDyslexiaStyles();
   }
 });
 
-// Load saved settings
-chrome.storage.sync.get(['visionType', 'correction', 'dyslexiaSettings'], (settings) => {
-  if (settings.visionType) {
-    const filter = settings.correction ? correctionFilters[settings.visionType] : filters[settings.visionType];
-    overlay.style.filter = filter;
+function applyColorFilter(filter) {
+  let overlay = document.getElementById('vision-aid-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'vision-aid-overlay';
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      zIndex: 999999,
+      pointerEvents: 'none',
+      mixBlendMode: 'normal'
+    });
+    document.body.appendChild(overlay);
   }
-  if (settings.dyslexiaSettings && settings.dyslexiaSettings.isEnabled) {
-    applyDyslexiaStyles(settings.dyslexiaSettings);
+  overlay.style.backdropFilter = filter;
+  overlay.style.webkitBackdropFilter = filter;
+}
+
+function applyDyslexiaStyles(settings) {
+  removeDyslexiaStyles();
+
+  // Set CSS variables for all settings
+  document.documentElement.style.setProperty('--font-size', `${settings.fontSize}px`);
+  document.documentElement.style.setProperty('--line-height', settings.lineSpacing);
+  document.documentElement.style.setProperty('--letter-spacing', `${settings.letterSpacing}em`);
+  document.documentElement.style.setProperty('--word-spacing', `${settings.wordSpacing}em`);
+  document.documentElement.style.setProperty('--background-color', backgroundColorMap[settings.backgroundColor] || '#ffffff');
+  document.documentElement.style.setProperty('--column-width', `${settings.columnWidth}px`);
+
+  // Inject style if not present
+  if (!document.getElementById('visionaid-dyslexia-styles')) {
+    const style = document.createElement('style');
+    style.id = 'visionaid-dyslexia-styles';
+    style.innerHTML = `
+      @import url('https://fonts.googleapis.com/css2?family=Lexend&family=Andika&family=Atkinson+Hyperlegible&family=Comic+Neue&display=swap');
+      @import url('https://fonts.cdnfonts.com/css/open-dyslexic');
+      .visionaid-text {
+        font-family: '${fontMap[settings.fontFamily] || 'OpenDyslexic'}', sans-serif !important;
+        font-size: var(--font-size) !important;
+        line-height: var(--line-height) !important;
+        letter-spacing: var(--letter-spacing) !important;
+        word-spacing: var(--word-spacing) !important;
+        max-width: var(--column-width) !important;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+    `;
+    document.head.appendChild(style);
   }
-});
+
+  // Add class to all readable tags
+  const readableTags = ['p', 'span', 'li', 'label', 'a', 'strong', 'em', 'blockquote', 'dd', 'dt', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+  readableTags.forEach(tag => {
+    document.querySelectorAll(tag).forEach(el => {
+      el.classList.add('visionaid-text');
+    });
+  });
+
+  // Reading ruler and bionic reading
+  if (settings.readingRuler) enableReadingRuler();
+  if (settings.bionicReading) enableBionicReading();
+}
+
+function removeDyslexiaStyles() {
+  document.querySelectorAll('.visionaid-text').forEach(el => {
+    el.classList.remove('visionaid-text');
+  });
+
+  const style = document.getElementById('visionaid-dyslexia-styles');
+  if (style) style.remove();
+
+  // Do NOT set document.body.style.backgroundColor here!
+  disableReadingRuler();
+  disableBionicReading();
+}
+
+const backgroundColorMap = {
+  white: '#ffffff',
+  cream: '#fff5e6',
+  cool: '#e6f0fa',
+  mint: '#e6fff6'
+};
+
+function enableReadingRuler() {
+  let ruler = document.getElementById('visionaid-ruler');
+  if (!ruler) {
+    ruler = document.createElement('div');
+    ruler.id = 'visionaid-ruler';
+    Object.assign(ruler.style, {
+      position: 'fixed',
+      left: 0,
+      width: '100vw',
+      height: '40px',
+      backgroundColor: 'rgba(0,0,0,0.1)',
+      pointerEvents: 'none',
+      zIndex: 999998
+    });
+    document.body.appendChild(ruler);
+    document.addEventListener('mousemove', updateRulerPosition);
+  }
+}
+
+function updateRulerPosition(e) {
+  const ruler = document.getElementById('visionaid-ruler');
+  if (ruler) {
+    ruler.style.top = `${e.clientY - 20}px`;
+  }
+}
+
+function disableReadingRuler() {
+  const ruler = document.getElementById('visionaid-ruler');
+  if (ruler) ruler.remove();
+  document.removeEventListener('mousemove', updateRulerPosition);
+}
+
+function enableBionicReading() {
+  const maxNodes = 1000;
+  let count = 0;
+
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode: node => {
+        if (
+          !node.parentNode ||
+          node.parentNode.closest('script, style, noscript, iframe') ||
+          node.textContent.trim().length < 4
+        ) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    }
+  );
+
+  const nodes = [];
+  while (walker.nextNode()) {
+    if (count++ > maxNodes) break;
+    nodes.push(walker.currentNode);
+  }
+
+  nodes.forEach(node => {
+    const words = node.nodeValue.split(/(\s+)/);
+    const transformed = words.map(word => {
+      if (word.trim().length <= 2) return word;
+      const splitIndex = Math.ceil(word.length / 2);
+      return `<b>${word.slice(0, splitIndex)}</b>${word.slice(splitIndex)}`;
+    }).join('');
+
+    const span = document.createElement('span');
+    span.innerHTML = transformed;
+    node.parentNode.replaceChild(span, node);
+  });
+}
+
+function disableBionicReading() {
+  document.querySelectorAll('span').forEach(el => {
+    if (el.innerHTML.includes('<b>')) {
+      el.outerHTML = el.textContent;
+    }
+  });
+}

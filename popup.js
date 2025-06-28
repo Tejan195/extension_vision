@@ -6,8 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const dyslexiaSupport = document.getElementById('dyslexiaSupport');
   const fontFamilySelect = document.getElementById('fontFamilySelect');
   const fontFamilyOptions = document.getElementById('fontFamilyOptions');
-  const textSettingsSelect = document.getElementById('textSettingsSelect');
-  const textSettingsOptions = document.getElementById('textSettingsOptions');
   const fontSize = document.getElementById('fontSize');
   const fontSizeValue = document.getElementById('fontSizeValue');
   const lineSpacing = document.getElementById('lineSpacing');
@@ -16,23 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const letterSpacingValue = document.getElementById('letterSpacingValue');
   const wordSpacing = document.getElementById('wordSpacing');
   const wordSpacingValue = document.getElementById('wordSpacingValue');
-  const columnWidthSelect = document.getElementById('columnWidthSelect');
-  const columnWidthOptions = document.getElementById('columnWidthOptions');
-  const readingRuler = document.getElementById('readingRuler');
-  const bionicReading = document.getElementById('bionicReading');
+  const columnWidth = document.getElementById('columnWidth');
+  const columnWidthValue = document.getElementById('columnWidthValue');
   const bgButtons = document.querySelectorAll('.bg-button');
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabPanes = document.querySelectorAll('.tab-pane');
   const subPanels = document.querySelectorAll('.sub-panel');
-
-  // Debug: Log all elements
-  console.log({
-    visionType, optionsList, correction, dyslexiaSupport,
-    fontFamilySelect, fontFamilyOptions, textSettingsSelect, textSettingsOptions,
-    fontSize, fontSizeValue, lineSpacing, lineSpacingValue,
-    letterSpacing, letterSpacingValue, wordSpacing, wordSpacingValue,
-    columnWidthSelect, columnWidthOptions, readingRuler, bionicReading
-  });
 
   const filters = {
     protanopia: 'saturate(0.5) sepia(0.3) hue-rotate(-20deg)',
@@ -50,10 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const defaultDyslexiaSettings = {
     fontFamily: 'opendyslexic',
-    fontSize: 18,
-    lineSpacing: 1.8,
-    letterSpacing: 0.5,
-    wordSpacing: 0.3,
+    fontSize: 16,
+    lineSpacing: 1.5,
+    letterSpacing: 0,
+    wordSpacing: 0,
     columnWidth: 800,
     backgroundColor: 'cream',
     readingRuler: true,
@@ -78,21 +65,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Dropdowns
   const dropdowns = [
     { select: visionType, optionsId: 'selectOptions' },
-    { select: fontFamilySelect, optionsId: 'fontFamilyOptions' },
-    { select: textSettingsSelect, optionsId: 'textSettingsOptions' },
-    { select: columnWidthSelect, optionsId: 'columnWidthOptions' }
+    { select: fontFamilySelect, optionsId: 'fontFamilyOptions' }
   ].filter(d => d.select);
 
   dropdowns.forEach(({ select, optionsId }) => {
     select.addEventListener('click', (e) => {
-      console.log('Clicked dropdown:', select.id);
       e.stopPropagation();
       select.classList.toggle('open');
       const options = document.getElementById(optionsId);
       if (options) {
         options.classList.toggle('open');
-      } else {
-        console.error(`Options element not found: ${optionsId}`);
       }
     });
   });
@@ -137,21 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Text Settings Dropdown
-  if (textSettingsOptions) {
-    textSettingsOptions.querySelectorAll('li').forEach(option => {
-      option.addEventListener('click', () => {
-        const selected = textSettingsSelect.querySelector('.selected');
-        selected.textContent = option.textContent;
-        selected.dataset.subpanel = option.dataset.subpanel;
-        textSettingsSelect.classList.remove('open');
-        textSettingsOptions.classList.remove('open');
-        subPanels.forEach(panel => panel.classList.remove('active'));
-        document.getElementById(option.dataset.subpanel).classList.add('active');
-      });
-    });
-  }
-
   // Update Filters
   function updateFilters() {
     const selected = visionType.querySelector('.selected');
@@ -184,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
       lineSpacing: Number(lineSpacing.value),
       letterSpacing: Number(letterSpacing.value),
       wordSpacing: Number(wordSpacing.value),
-      columnWidth: Number(columnWidthSelect.querySelector('.selected').dataset.value),
+      columnWidth: Number(columnWidth.value),
       backgroundColor: document.querySelector('.bg-button.active')?.dataset.bg || 'white',
       readingRuler: readingRuler.classList.contains('active'),
       bionicReading: bionicReading.classList.contains('active')
@@ -193,48 +160,31 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.sync.set({ dyslexiaSettings: settings });
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]) {
+      if (tabs[0] && settings.isEnabled) {
         chrome.tabs.sendMessage(tabs[0].id, {
-          action: settings.isEnabled ? 'applyDyslexiaStyles' : 'removeDyslexiaStyles',
+          action: 'applyDyslexiaStyles',
           settings: settings
-        }, (response) => {
-          if (chrome.runtime.lastError) {
-            console.error('Error sending message to content script:', chrome.runtime.lastError);
-          } else {
-            console.log('Message sent to content script, response:', response);
-          }
         });
-      } else {
-        console.error('No active tab found');
+      } else if (tabs[0] && !settings.isEnabled) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'removeDyslexiaStyles'
+        });
       }
     });
   }
 
   // Sliders
-  [fontSize, lineSpacing, letterSpacing, wordSpacing].forEach(input => {
+  [fontSize, lineSpacing, letterSpacing, wordSpacing, columnWidth].forEach(input => {
     if (input) {
       input.addEventListener('input', () => {
         const valueSpan = document.getElementById(`${input.id}Value`);
-        valueSpan.textContent = input.value + (input.id === 'fontSize' ? 'px' : input.id === 'lineSpacing' ? 'x' : 'em');
-        dyslexiaSupport.checked = false;
-        updateDyslexiaSettings();
+        valueSpan.textContent = input.value + (input.id === 'fontSize' ? 'px' : input.id === 'lineSpacing' ? 'x' : 'px');
+        if (dyslexiaSupport.checked) {
+          updateDyslexiaSettings();
+        }
       });
     }
   });
-
-  // Column Width Dropdown
-  if (columnWidthOptions) {
-    columnWidthOptions.querySelectorAll('li').forEach(option => {
-      option.addEventListener('click', () => {
-        const selected = columnWidthSelect.querySelector('.selected');
-        selected.textContent = option.textContent;
-        selected.dataset.value = option.dataset.value;
-        columnWidthSelect.classList.remove('open');
-        columnWidthOptions.classList.remove('open');
-        updateDyslexiaSettings();
-      });
-    });
-  }
 
   // Enable/Disable All
   if (dyslexiaSupport) {
@@ -244,36 +194,30 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isEnabled) {
         fontFamilySelect.querySelector('.selected').textContent = 'OpenDyslexic';
         fontFamilySelect.querySelector('.selected').dataset.value = 'opendyslexic';
-        textSettingsSelect.querySelector('.selected').textContent = 'Font Size';
-        textSettingsSelect.querySelector('.selected').dataset.subpanel = 'font-size';
         fontSize.value = defaultDyslexiaSettings.fontSize;
         fontSizeValue.textContent = `${defaultDyslexiaSettings.fontSize}px`;
         lineSpacing.value = defaultDyslexiaSettings.lineSpacing;
         lineSpacingValue.textContent = `${defaultDyslexiaSettings.lineSpacing}x`;
         letterSpacing.value = defaultDyslexiaSettings.letterSpacing;
-        letterSpacingValue.textContent = `${defaultDyslexiaSettings.letterSpacing}em`;
+        letterSpacingValue.textContent = `${defaultDyslexiaSettings.letterSpacing}px`;
         wordSpacing.value = defaultDyslexiaSettings.wordSpacing;
-        wordSpacingValue.textContent = `${defaultDyslexiaSettings.wordSpacing}em`;
-        columnWidthSelect.querySelector('.selected').textContent = `${defaultDyslexiaSettings.columnWidth}px`;
-        columnWidthSelect.querySelector('.selected').dataset.value = defaultDyslexiaSettings.columnWidth;
+        wordSpacingValue.textContent = `${defaultDyslexiaSettings.wordSpacing}px`;
+        columnWidth.value = defaultDyslexiaSettings.columnWidth;
+        columnWidthValue.textContent = `${defaultDyslexiaSettings.columnWidth}px`;
         bgButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.bg === 'cream'));
         readingRuler.classList.add('active');
         bionicReading.classList.add('active');
       } else {
-        fontFamilySelect.querySelector('.selected').textContent = 'OpenDyslexic';
-        fontFamilySelect.querySelector('.selected').dataset.value = 'opendyslexic';
-        textSettingsSelect.querySelector('.selected').textContent = 'Font Size';
-        textSettingsSelect.querySelector('.selected').dataset.subpanel = 'font-size';
         fontSize.value = 16;
         fontSizeValue.textContent = '16px';
         lineSpacing.value = 1.5;
         lineSpacingValue.textContent = '1.5x';
         letterSpacing.value = 0;
-        letterSpacingValue.textContent = '0em';
+        letterSpacingValue.textContent = '0px';
         wordSpacing.value = 0;
-        wordSpacingValue.textContent = '0em';
-        columnWidthSelect.querySelector('.selected').textContent = '800px';
-        columnWidthSelect.querySelector('.selected').dataset.value = '800';
+        wordSpacingValue.textContent = '0px';
+        columnWidth.value = 800;
+        columnWidthValue.textContent = '800px';
         bgButtons.forEach(btn => btn.classList.remove('active'));
         readingRuler.classList.remove('active');
         bionicReading.classList.remove('active');
@@ -288,7 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       bgButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      dyslexiaSupport.checked = false;
       updateDyslexiaSettings();
     });
   });
@@ -297,7 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
   [readingRuler, bionicReading].forEach(btn => {
     btn.addEventListener('click', () => {
       btn.classList.toggle('active');
-      dyslexiaSupport.checked = false;
       updateDyslexiaSettings();
     });
   });
@@ -320,22 +262,16 @@ document.addEventListener('DOMContentLoaded', () => {
         fontFamilySelect.querySelector('.selected').textContent = settings.fontFamily.charAt(0).toUpperCase() + settings.fontFamily.slice(1);
         fontFamilySelect.querySelector('.selected').dataset.value = settings.fontFamily;
       }
-      if (textSettingsSelect) {
-        textSettingsSelect.querySelector('.selected').textContent = 'Font Size';
-        textSettingsSelect.querySelector('.selected').dataset.subpanel = 'font-size';
-      }
       if (fontSize) fontSize.value = settings.fontSize;
       if (fontSizeValue) fontSizeValue.textContent = `${settings.fontSize}px`;
       if (lineSpacing) lineSpacing.value = settings.lineSpacing;
       if (lineSpacingValue) lineSpacingValue.textContent = `${settings.lineSpacing}x`;
       if (letterSpacing) letterSpacing.value = settings.letterSpacing;
-      if (letterSpacingValue) letterSpacingValue.textContent = `${settings.letterSpacing}em`;
+      if (letterSpacingValue) letterSpacingValue.textContent = `${settings.letterSpacing}px`;
       if (wordSpacing) wordSpacing.value = settings.wordSpacing;
-      if (wordSpacingValue) wordSpacingValue.textContent = `${settings.wordSpacing}em`;
-      if (columnWidthSelect) {
-        columnWidthSelect.querySelector('.selected').textContent = `${settings.columnWidth}px`;
-        columnWidthSelect.querySelector('.selected').dataset.value = settings.columnWidth;
-      }
+      if (wordSpacingValue) wordSpacingValue.textContent = `${settings.wordSpacing}px`;
+      if (columnWidth) columnWidth.value = settings.columnWidth;
+      if (columnWidthValue) columnWidthValue.textContent = `${settings.columnWidth}px`;
       bgButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.bg === settings.backgroundColor));
       if (readingRuler) readingRuler.classList.toggle('active', settings.readingRuler);
       if (bionicReading) bionicReading.classList.toggle('active', settings.bionicReading);
