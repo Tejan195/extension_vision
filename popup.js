@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabPanes = document.querySelectorAll('.tab-pane');
   const subPanels = document.querySelectorAll('.sub-panel');
+  const readingRuler = document.getElementById('readingRuler');
+  const bionicReading = document.getElementById('bionicReading');
 
   const filters = {
     protanopia: 'saturate(0.5) sepia(0.3) hue-rotate(-20deg)',
@@ -160,15 +162,13 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.sync.set({ dyslexiaSettings: settings });
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0] && settings.isEnabled) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          action: 'applyDyslexiaStyles',
-          settings: settings
-        });
-      } else if (tabs[0] && !settings.isEnabled) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          action: 'removeDyslexiaStyles'
-        });
+      if (tabs[0]) {
+        chrome.tabs.sendMessage(
+          tabs[0].id,
+          settings.isEnabled
+            ? { action: 'applyDyslexiaStyles', settings }
+            : { action: 'removeDyslexiaStyles' }
+        );
       }
     });
   }
